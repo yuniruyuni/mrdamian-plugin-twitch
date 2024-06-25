@@ -1,0 +1,50 @@
+{
+  "name": "mrdamian-plugin-twitch",
+  "productName": "mrdamian-plugin-twitch",
+  "description": "Mr.Damian plugin for twitch",
+  "homepage": "https://github.com/yuniruyuni/mrdamian-plugin-twitch/README.md",
+  "repository": "https://github.com/yuniruyuni/mrdamian-plugin-twitch",
+  "bugs": "https://github.com/yuniruyuni/mrdamian-plugin-twitch/issues",
+  "version": "0.0.1",
+  "author": {
+    "name": "yuniruyuni",
+    "email": "yuniruyuni@gmail.com"
+  },
+  "files": [
+    "index.ts",
+    "tsconfig.json",
+    "dist"
+  ],
+  "keywords": [
+    "mrdamian"
+  ],
+  "license": "MIT",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "run-s build:backend",
+    "build:backend": "NODE_ENV=production bun build --minify --outdir=dist/ index.ts",
+    "check": "biome check --write",
+    "format": "biome format --write",
+    "lint": "biome lint",
+    "prepublishOnly": "bun run build",
+    "test": "bun test",
+    "type": "tsc --noEmit"
+  },
+  "dependencies": {
+    "mrdamian": "^0.0.1",
+    "@twurple/api": "^7.1.0",
+    "@twurple/auth": "^7.1.0",
+    "@twurple/chat": "^7.1.0",
+    "@twurple/eventsub-ws": "^7.1.0",
+    "open": "^10.1.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.8.1",
+    "@types/bun": "^1.1.4",
+    "@types/node": "^20.14.4",
+    "bun": "^1.1.13",
+    "npm-run-all2": "^6.2.0",
+    "typescript": "^5.4.5"
+  }
+}
