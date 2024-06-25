@@ -12,6 +12,7 @@
   },
   "files": [
     "index.ts",
+    "oauth.ts",
     "tsconfig.json",
     "dist"
   ],
@@ -19,15 +20,12 @@
     "mrdamian"
   ],
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "index.ts",
   "type": "module",
   "scripts": {
-    "build": "run-s build:backend",
-    "build:backend": "NODE_ENV=production bun build --minify --outdir=dist/ index.ts",
     "check": "biome check --write",
     "format": "biome format --write",
     "lint": "biome lint",
-    "prepublishOnly": "bun run build",
     "test": "bun test",
     "type": "tsc --noEmit"
   },
