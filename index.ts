@@ -1,9 +1,7 @@
 import type { StaticAuthProvider } from "@twurple/auth";
 import { ChatClient } from "@twurple/chat";
 
-import { Component } from "mrdamian/model/component";
-import type { ComponentConfig } from "mrdamian/model/parameters";
-import type { Field } from "mrdamian/model/variable";
+import { Component, type ComponentConfig, type Field } from "mrdamian-plugin";
 
 import { DeviceCodeGrantFlow } from "./oauth";
 

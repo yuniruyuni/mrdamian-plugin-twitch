@@ -5,7 +5,7 @@
 	"homepage": "https://github.com/yuniruyuni/mrdamian-plugin-twitch/README.md",
 	"repository": "https://github.com/yuniruyuni/mrdamian-plugin-twitch",
 	"bugs": "https://github.com/yuniruyuni/mrdamian-plugin-twitch/issues",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"author": {
 		"name": "yuniruyuni",
 		"email": "yuniruyuni@gmail.com"
@@ -23,7 +23,7 @@
 		"type": "tsc --noEmit"
 	},
 	"dependencies": {
-		"mrdamian": "^0.0.3",
+		"mrdamian-plugin": "^0.0.5",
 		"@twurple/api": "^7.1.0",
 		"@twurple/auth": "^7.1.0",
 		"@twurple/chat": "^7.1.0",
