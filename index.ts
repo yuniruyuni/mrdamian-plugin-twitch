@@ -35,11 +35,11 @@ function isSendConfig(
 }
 
 export default class Twitch extends Component<TwitchConfig> {
-	async initialize(config: TwitchConfig): Promise<void> {
+	async start(config: TwitchConfig): Promise<void> {
 		if (isLoginConfig(config)) {
 			// we don't await this function call,
 			// because system can process other things while user is processing login.
-			this.login(config);
+			await this.login(config);
 		}
 	}
 
@@ -53,6 +53,12 @@ export default class Twitch extends Component<TwitchConfig> {
 		}
 
 		return undefined;
+	}
+
+	async stop(config: TwitchConfig): Promise<void> {
+		this.chatClient?.quit();
+		this.chatClient = undefined;
+		this.channel = undefined;
 	}
 
 	authProvider?: StaticAuthProvider;
