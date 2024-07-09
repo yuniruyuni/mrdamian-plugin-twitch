@@ -42,7 +42,7 @@ jobs:
         with:
           node-version: '20.14.0'
           registry-url: 'https://registry.npmjs.org'
-      - run: bun install
+      - run: bun install --frozen-lockfile
       - name: publish npm
         run: npm publish --access public
         env:
