@@ -1,13 +1,18 @@
 import type { StaticAuthProvider } from "@twurple/auth";
 import { ChatClient } from "@twurple/chat";
 
-import { Component, type ComponentConfig, type Field } from "mrdamian-plugin";
+import type { Component, ComponentConfig, EventEmitter, Field } from "mrdamian-plugin";
 
 import { DeviceCodeGrantFlow } from "./oauth";
 
 type LoginConfig = {
 	action: "login" | "" | undefined;
 	channel: string;
+};
+
+
+type ReceiveConfig = {
+	action: "receive";
 };
 
 type SendConfig = {
@@ -17,7 +22,7 @@ type SendConfig = {
 	};
 };
 
-type TwitchConfig = ComponentConfig & (LoginConfig | SendConfig);
+type TwitchConfig = ComponentConfig & (LoginConfig | SendConfig | ReceiveConfig);
 
 function isLoginConfig(
 	config: TwitchConfig,
@@ -34,7 +39,21 @@ function isSendConfig(
 	return config.action === "send";
 }
 
-export default class Twitch extends Component<TwitchConfig> {
+function isReceiveConfig(
+	config: TwitchConfig,
+): config is ComponentConfig & ReceiveConfig {
+	return config.action === "receive";
+}
+
+export default class Twitch implements Component<TwitchConfig> {
+	emitters: EventEmitter[] = [];
+
+	async initialize(config: TwitchConfig, emitter: EventEmitter): Promise<void> {
+		if( isLoginConfig(config) || isReceiveConfig(config) ) {
+			this.emitters.push(emitter);
+		}
+	}
+
 	async start(config: TwitchConfig): Promise<void> {
 		if (isLoginConfig(config)) {
 			// we don't await this function call,
@@ -61,6 +80,10 @@ export default class Twitch extends Component<TwitchConfig> {
 		this.channel = undefined;
 	}
 
+	async uninitialize(): Promise<void> {
+		this.emitters = [];
+	}
+
 	authProvider?: StaticAuthProvider;
 	chatClient?: ChatClient;
 	channel?: string;
@@ -81,6 +104,12 @@ export default class Twitch extends Component<TwitchConfig> {
 
 		await this.chatClient.say(this.channel, config.args.message);
 		return undefined;
+	}
+
+	emit(data: Field) {
+		for (const emitter of this.emitters) {
+			emitter.emit(data);
+		}
 	}
 
 	async startReceiveThread(channel: string): Promise<void> {
