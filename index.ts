@@ -1,80 +1,77 @@
 import type { StaticAuthProvider } from "@twurple/auth";
 import { ChatClient } from "@twurple/chat";
-
-import type { Component, ComponentConfig, EventEmitter, Field } from "mrdamian-plugin";
-
+import type { Action, Component, EventEmitter, Field } from "mrdamian-plugin";
 import { DeviceCodeGrantFlow } from "./oauth";
 
-type LoginConfig = {
+type LoginAction = {
 	action: "login" | "" | undefined;
 	channel: string;
 };
 
-
-type ReceiveConfig = {
+type ReceiveAction = {
 	action: "receive";
 };
 
-type SendConfig = {
+type SendAction = {
 	action: "send";
 	args: {
 		message: string;
 	};
 };
 
-type TwitchConfig = ComponentConfig & (LoginConfig | SendConfig | ReceiveConfig);
+type TwitchAction = Action & (LoginAction | SendAction | ReceiveAction);
 
-function isLoginConfig(
-	config: TwitchConfig,
-): config is ComponentConfig & LoginConfig {
-	if (config.action === undefined) return true;
-	if (config.action === "") return true;
-	if (config.action === "login") return true;
+function isLoginAction(
+	action: TwitchAction,
+): action is Action & LoginAction {
+	if (action.action === undefined) return true;
+	if (action.action === "") return true;
+	if (action.action === "login") return true;
 	return false;
 }
 
-function isSendConfig(
-	config: TwitchConfig,
-): config is ComponentConfig & SendConfig {
-	return config.action === "send";
+function isSendAction(
+	action: TwitchAction,
+): action is Action & SendAction {
+	return action.action === "send";
 }
 
-function isReceiveConfig(
-	config: TwitchConfig,
-): config is ComponentConfig & ReceiveConfig {
-	return config.action === "receive";
+function isReceiveAction(
+	action: TwitchAction,
+): action is Action & ReceiveAction {
+	return action.action === "receive";
 }
 
-export default class Twitch implements Component<TwitchConfig> {
+export default class Twitch implements Component<TwitchAction> {
 	emitters: EventEmitter[] = [];
 
-	async initialize(config: TwitchConfig, emitter: EventEmitter): Promise<void> {
-		if( isLoginConfig(config) || isReceiveConfig(config) ) {
+	async initialize(action: TwitchAction, emitter: EventEmitter): Promise<void> {
+		if( isLoginAction(action) || isReceiveAction(action) ) {
 			this.emitters.push(emitter);
 		}
 	}
 
-	async start(config: TwitchConfig): Promise<void> {
-		if (isLoginConfig(config)) {
+	async start(action: TwitchAction): Promise<void> {
+		if (isLoginAction(action)) {
 			// we don't await this function call,
 			// because system can process other things while user is processing login.
-			await this.login(config);
+			await this.login(action);
 		}
 	}
 
-	async process(config: TwitchConfig): Promise<Field> {
-		if (isLoginConfig(config)) {
+	async process(action: TwitchAction): Promise<Field> {
+		if (isLoginAction(action)) {
 			return undefined;
 		}
 
-		if (isSendConfig(config)) {
-			return await this.send(config);
+		if (isSendAction(action)) {
+			return await this.send(action);
 		}
 
 		return undefined;
 	}
 
-	async stop(config: TwitchConfig): Promise<void> {
+	async stop(action: TwitchAction): Promise<void> {
 		this.chatClient?.quit();
 		this.chatClient = undefined;
 		this.channel = undefined;
@@ -88,21 +85,21 @@ export default class Twitch implements Component<TwitchConfig> {
 	chatClient?: ChatClient;
 	channel?: string;
 
-	async login(config: LoginConfig) {
+	async login(action: LoginAction) {
 		const flow = new DeviceCodeGrantFlow();
 		this.authProvider = await flow.login();
 
 		// start receiving thread so we don't await this call.
-		this.startReceiveThread(config.channel);
+		this.startReceiveThread(action.channel);
 	}
 
-	public async send(config: SendConfig): Promise<Field> {
+	public async send(action: SendAction): Promise<Field> {
 		// not yet logged-in.
 		if (!this.channel || !this.chatClient) {
 			return undefined;
 		}
 
-		await this.chatClient.say(this.channel, config.args.message);
+		await this.chatClient.say(this.channel, action.args.message);
 		return undefined;
 	}
 
